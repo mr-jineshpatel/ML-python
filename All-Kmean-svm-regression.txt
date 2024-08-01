@@ -1,0 +1,987 @@
+
+
+    import numpy as np
+    import pandas as pd
+    import seaborn as sb
+    import matplotlib.pyplot as plt
+    %matplotlib inline
+
+    df=pd.read_csv('iris.csv')
+
+    df.drop(columns=['sepal.width','sepal.length'], inplace=True)
+    print(df)
+    print(df['variety'].value_counts())
+    #df=sb.load_dataset('iris')
+    #print(df)
+
+         petal.length  petal.width    variety
+    0             1.4          0.2     Setosa
+    1             1.4          0.2     Setosa
+    2             1.3          0.2     Setosa
+    3             1.5          0.2     Setosa
+    4             1.4          0.2     Setosa
+    ..            ...          ...        ...
+    145           5.2          2.3  Virginica
+    146           5.0          1.9  Virginica
+    147           5.2          2.0  Virginica
+    148           5.4          2.3  Virginica
+    149           5.1          1.8  Virginica
+
+    [150 rows x 3 columns]
+    variety
+    Setosa        50
+    Versicolor    50
+    Virginica     50
+    Name: count, dtype: int64
+
+    #Classification with kmeans
+
+    X=df.iloc[:,:-1].values
+    print(X)
+    Y=df.iloc[:,-1:].values
+    print(Y)
+
+    [[1.4 0.2]
+     [1.4 0.2]
+     [1.3 0.2]
+     [1.5 0.2]
+     [1.4 0.2]
+     [1.7 0.4]
+     [1.4 0.3]
+     [1.5 0.2]
+     [1.4 0.2]
+     [1.5 0.1]
+     [1.5 0.2]
+     [1.6 0.2]
+     [1.4 0.1]
+     [1.1 0.1]
+     [1.2 0.2]
+     [1.5 0.4]
+     [1.3 0.4]
+     [1.4 0.3]
+     [1.7 0.3]
+     [1.5 0.3]
+     [1.7 0.2]
+     [1.5 0.4]
+     [1.  0.2]
+     [1.7 0.5]
+     [1.9 0.2]
+     [1.6 0.2]
+     [1.6 0.4]
+     [1.5 0.2]
+     [1.4 0.2]
+     [1.6 0.2]
+     [1.6 0.2]
+     [1.5 0.4]
+     [1.5 0.1]
+     [1.4 0.2]
+     [1.5 0.2]
+     [1.2 0.2]
+     [1.3 0.2]
+     [1.4 0.1]
+     [1.3 0.2]
+     [1.5 0.2]
+     [1.3 0.3]
+     [1.3 0.3]
+     [1.3 0.2]
+     [1.6 0.6]
+     [1.9 0.4]
+     [1.4 0.3]
+     [1.6 0.2]
+     [1.4 0.2]
+     [1.5 0.2]
+     [1.4 0.2]
+     [4.7 1.4]
+     [4.5 1.5]
+     [4.9 1.5]
+     [4.  1.3]
+     [4.6 1.5]
+     [4.5 1.3]
+     [4.7 1.6]
+     [3.3 1. ]
+     [4.6 1.3]
+     [3.9 1.4]
+     [3.5 1. ]
+     [4.2 1.5]
+     [4.  1. ]
+     [4.7 1.4]
+     [3.6 1.3]
+     [4.4 1.4]
+     [4.5 1.5]
+     [4.1 1. ]
+     [4.5 1.5]
+     [3.9 1.1]
+     [4.8 1.8]
+     [4.  1.3]
+     [4.9 1.5]
+     [4.7 1.2]
+     [4.3 1.3]
+     [4.4 1.4]
+     [4.8 1.4]
+     [5.  1.7]
+     [4.5 1.5]
+     [3.5 1. ]
+     [3.8 1.1]
+     [3.7 1. ]
+     [3.9 1.2]
+     [5.1 1.6]
+     [4.5 1.5]
+     [4.5 1.6]
+     [4.7 1.5]
+     [4.4 1.3]
+     [4.1 1.3]
+     [4.  1.3]
+     [4.4 1.2]
+     [4.6 1.4]
+     [4.  1.2]
+     [3.3 1. ]
+     [4.2 1.3]
+     [4.2 1.2]
+     [4.2 1.3]
+     [4.3 1.3]
+     [3.  1.1]
+     [4.1 1.3]
+     [6.  2.5]
+     [5.1 1.9]
+     [5.9 2.1]
+     [5.6 1.8]
+     [5.8 2.2]
+     [6.6 2.1]
+     [4.5 1.7]
+     [6.3 1.8]
+     [5.8 1.8]
+     [6.1 2.5]
+     [5.1 2. ]
+     [5.3 1.9]
+     [5.5 2.1]
+     [5.  2. ]
+     [5.1 2.4]
+     [5.3 2.3]
+     [5.5 1.8]
+     [6.7 2.2]
+     [6.9 2.3]
+     [5.  1.5]
+     [5.7 2.3]
+     [4.9 2. ]
+     [6.7 2. ]
+     [4.9 1.8]
+     [5.7 2.1]
+     [6.  1.8]
+     [4.8 1.8]
+     [4.9 1.8]
+     [5.6 2.1]
+     [5.8 1.6]
+     [6.1 1.9]
+     [6.4 2. ]
+     [5.6 2.2]
+     [5.1 1.5]
+     [5.6 1.4]
+     [6.1 2.3]
+     [5.6 2.4]
+     [5.5 1.8]
+     [4.8 1.8]
+     [5.4 2.1]
+     [5.6 2.4]
+     [5.1 2.3]
+     [5.1 1.9]
+     [5.9 2.3]
+     [5.7 2.5]
+     [5.2 2.3]
+     [5.  1.9]
+     [5.2 2. ]
+     [5.4 2.3]
+     [5.1 1.8]]
+    [['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Setosa']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Versicolor']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']
+     ['Virginica']]
+
+    #when string data available
+    from sklearn.preprocessing import LabelEncoder
+
+    ley=LabelEncoder()
+    Y=ley.fit_transform(Y)
+    print(Y)
+
+    [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+     0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+     1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2
+     2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+     2 2]
+
+    C:\Users\ASUS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sklearn\preprocessing\_label.py:114: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples, ), for example using ravel().
+      y = column_or_1d(y, warn=True)
+
+    #classification
+    from sklearn.model_selection import train_test_split
+
+    X_train,X_test,Y_train,Y_test=train_test_split(X,Y,test_size=0.20)
+    X_train
+
+    array([[1.3, 0.2],
+           [1.5, 0.4],
+           [3.7, 1. ],
+           [1.2, 0.2],
+           [1.6, 0.4],
+           [5.1, 1.5],
+           [1.5, 0.2],
+           [1.5, 0.4],
+           [3.5, 1. ],
+           [1.3, 0.4],
+           [6. , 2.5],
+           [3.6, 1.3],
+           [6.6, 2.1],
+           [5. , 1.7],
+           [5.6, 2.2],
+           [4.9, 2. ],
+           [4.9, 1.8],
+           [5.3, 2.3],
+           [1.5, 0.4],
+           [1.1, 0.1],
+           [4.5, 1.6],
+           [1.6, 0.2],
+           [4.6, 1.5],
+           [3.9, 1.2],
+           [6. , 1.8],
+           [5. , 1.9],
+           [4.5, 1.5],
+           [3. , 1.1],
+           [1.4, 0.2],
+           [1.5, 0.1],
+           [4.5, 1.5],
+           [1.4, 0.3],
+           [5.5, 1.8],
+           [5.5, 2.1],
+           [4.3, 1.3],
+           [1.4, 0.1],
+           [3.8, 1.1],
+           [4.1, 1.3],
+           [1.4, 0.2],
+           [4.4, 1.2],
+           [1.5, 0.2],
+           [1.5, 0.2],
+           [5.6, 2.4],
+           [1.4, 0.2],
+           [5.5, 1.8],
+           [1.6, 0.2],
+           [4.5, 1.3],
+           [5.1, 1.8],
+           [6.3, 1.8],
+           [1.4, 0.3],
+           [4. , 1.2],
+           [5.1, 1.6],
+           [6.7, 2.2],
+           [1.7, 0.2],
+           [4.3, 1.3],
+           [1.6, 0.6],
+           [4.1, 1. ],
+           [3.5, 1. ],
+           [5.8, 1.6],
+           [1.5, 0.3],
+           [4.2, 1.2],
+           [5.6, 1.4],
+           [5.9, 2.3],
+           [4.6, 1.3],
+           [5.8, 1.8],
+           [1.5, 0.1],
+           [1.7, 0.3],
+           [6.4, 2. ],
+           [1.4, 0.1],
+           [4. , 1. ],
+           [5.4, 2.3],
+           [6.1, 1.9],
+           [4.7, 1.2],
+           [1.7, 0.4],
+           [5.6, 2.1],
+           [4.8, 1.8],
+           [5.1, 2.4],
+           [4. , 1.3],
+           [5.6, 1.8],
+           [1.7, 0.5],
+           [1.9, 0.2],
+           [1.3, 0.2],
+           [1. , 0.2],
+           [1.6, 0.2],
+           [5.8, 2.2],
+           [5.4, 2.1],
+           [4.7, 1.4],
+           [1.4, 0.2],
+           [4.9, 1.8],
+           [1.5, 0.2],
+           [3.3, 1. ],
+           [1.6, 0.2],
+           [1.5, 0.2],
+           [1.4, 0.2],
+           [4.5, 1.5],
+           [1.4, 0.2],
+           [6.1, 2.3],
+           [6.7, 2. ],
+           [3.9, 1.4],
+           [5. , 1.5],
+           [4. , 1.3],
+           [1.5, 0.2],
+           [4.2, 1.3],
+           [4.5, 1.5],
+           [6.1, 2.5],
+           [4.8, 1.8],
+           [1.2, 0.2],
+           [4. , 1.3],
+           [1.4, 0.2],
+           [3.3, 1. ],
+           [5.1, 2.3],
+           [1.3, 0.3],
+           [5.1, 1.9],
+           [5.3, 1.9],
+           [4.6, 1.4],
+           [5.7, 2.5],
+           [4.5, 1.7],
+           [4.2, 1.3],
+           [4.9, 1.5],
+           [1.4, 0.2]])
+
+    print(Y_train)
+    print(X_train.size)
+    print(Y_train.size)
+    print(X_test.size)
+    print(Y_test.size)
+
+    [2 1 2 0 0 2 2 1 1 1 1 1 0 0 2 0 1 2 2 2 1 2 1 0 1 1 1 1 0 2 0 0 2 1 2 1 0
+     2 1 2 0 2 2 1 0 1 0 1 1 0 2 1 2 0 2 2 2 2 2 2 2 2 0 1 0 0 1 1 0 2 2 1 0 1
+     2 1 2 1 1 1 0 1 0 1 0 0 0 1 0 2 1 2 0 2 2 0 1 2 0 0 0 2 1 0 1 1 1 0 2 0 2
+     0 0 2 2 1 2 2 1 2]
+    240
+    120
+    60
+    30
+
+    #linear regression
+    from sklearn.linear_model import LinearRegression
+
+    lr=LinearRegression()
+    iris=lr.fit(X_train,Y_train)
+    predict=iris.predict(X_test)
+
+    print(predict)
+    print(Y_test)
+
+    [ 1.97056151e+00  1.69348176e+00 -1.03012941e-01  1.10823057e+00
+      1.39187706e+00  1.59075795e+00  1.10542774e-01  1.83694670e+00
+      1.10542774e-01 -5.89884487e-02  1.41311864e+00  1.02346496e+00
+      2.57771625e-02  1.32178628e+00  1.16692989e+00  1.46196784e+00
+     -2.96387870e-02  1.32178628e+00 -2.89125283e-04 -4.43136178e-02
+     -1.49639561e-02  1.32178628e+00 -2.96387870e-02 -1.14404398e-01
+     -2.96387870e-02  2.09983216e-01  1.27776179e+00  2.57771625e-02
+      1.10823057e+00  2.25749138e+00]
+    [2 2 0 1 1 2 0 2 0 0 2 1 0 1 1 2 0 1 0 0 0 1 0 0 0 0 1 0 1 2]
+
+    #find r2 score
+    from sklearn.metrics import r2_score
+
+    r2_score(Y_test,predict)
+
+    0.9130381044356761
+
+    #find scatter plot
+    plt.scatter(df['petal.length'],df['petal.width'])
+    plt.xlabel('Length')
+    plt.ylabel('Width')
+    plt.show()
+
+[]
+
+km=Kmean(n_clusters=2) km.fit(df[['sepal.length','sepal.width']])
+y_pred=km.predict([[1.]])
+
+    #find kmeans clustering
+    from sklearn.cluster import KMeans
+
+    km=KMeans(n_clusters=2)
+    km.fit(df[['petal.length','petal.width']])
+    y_pred=km.predict([[1.4,'0.4']])
+    y_pred
+
+    C:\Users\ASUS\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sklearn\base.py:493: UserWarning: X does not have valid feature names, but KMeans was fitted with feature names
+      warnings.warn(
+
+    array([0])
+
+    #find kmeans clustering
+    df['cluster']=km.labels_
+    df.head(20)
+
+        petal.length  petal.width variety  cluster
+    0            1.4          0.2  Setosa        0
+    1            1.4          0.2  Setosa        0
+    2            1.3          0.2  Setosa        0
+    3            1.5          0.2  Setosa        0
+    4            1.4          0.2  Setosa        0
+    5            1.7          0.4  Setosa        0
+    6            1.4          0.3  Setosa        0
+    7            1.5          0.2  Setosa        0
+    8            1.4          0.2  Setosa        0
+    9            1.5          0.1  Setosa        0
+    10           1.5          0.2  Setosa        0
+    11           1.6          0.2  Setosa        0
+    12           1.4          0.1  Setosa        0
+    13           1.1          0.1  Setosa        0
+    14           1.2          0.2  Setosa        0
+    15           1.5          0.4  Setosa        0
+    16           1.3          0.4  Setosa        0
+    17           1.4          0.3  Setosa        0
+    18           1.7          0.3  Setosa        0
+    19           1.5          0.3  Setosa        0
+
+    #work with minmax scaller
+    from sklearn.preprocessing import MinMaxScaler
+
+    scaler=MinMaxScaler()
+
+    scaler.fit(df[['petal.width']])
+    df['petal.length']=scaler.transform(df[['petal.width']])
+
+    scaler.fit(df[['petal.length']])
+    df['petal.length']=scaler.transform(df[['petal.length']])
+
+    df.head()
+
+       petal.length  petal.width variety  cluster
+    0      0.041667          0.2  Setosa        0
+    1      0.041667          0.2  Setosa        0
+    2      0.041667          0.2  Setosa        0
+    3      0.041667          0.2  Setosa        0
+    4      0.041667          0.2  Setosa        0
+
+    #scatter plt
+    plt.scatter(df['petal.length'],df['petal.width'])
+
+    <matplotlib.collections.PathCollection at 0x1986bc89250>
+
+[]
+
+    #clustering using 3 clusters
+    km=KMeans(n_clusters=3)
+    y_predicted=km.fit_predict(df[['petal.length','petal.width']])
+    y_predicted
+
+    array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+           1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+           1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+           2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+           2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0,
+           0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+    #add new column cluster
+    df['cluster']=y_predicted
+    df.head()
+
+       petal.length  petal.width variety  cluster
+    0      0.041667          0.2  Setosa        1
+    1      0.041667          0.2  Setosa        1
+    2      0.041667          0.2  Setosa        1
+    3      0.041667          0.2  Setosa        1
+    4      0.041667          0.2  Setosa        1
+
+    #find cluster centers
+    cluster_centers = km.cluster_centers_
+    print(cluster_centers)
+
+    [[0.81597222 2.05833333]
+     [0.06083333 0.246     ]
+     [0.50961538 1.32307692]]
+
+    #assign center and create scatter plot
+    df1=df[df.cluster==0]
+    df2=df[df.cluster==1]
+
+    plt.scatter(df1['petal.length'],df1['petal.width'],color='green')
+    plt.scatter(df2['petal.length'],df2['petal.width'],color='red')
+    plt.scatter(km.cluster_centers_[:,0],km.cluster_centers_[:,1],color='purple',marker='*',label='centroid')
+    plt.legend()
+
+    <matplotlib.legend.Legend at 0x19869866550>
+
+[]
+
+    #elbow plot
+    k_rng=range(1,10)
+    sse=[]
+    for k in k_rng:
+        km=KMeans(n_clusters=k)
+        km.fit(df[['petal.length','petal.width']])
+        sse.append(km.inertia_)
+
+    #make elbow plot
+    plt.xlabel('K')
+    plt.ylabel('Sum of squared error')
+    plt.plot(k_rng,sse)
+
+    [<matplotlib.lines.Line2D at 0x1986bf076d0>]
+
+[]
+
+    #logistic Regression
+    from sklearn.linear_model import LogisticRegression
+
+    logmodel=LogisticRegression()
+    logmodel.fit(X_train,Y_train)
+
+    LogisticRegression()
+
+    y_pred=logmodel.predict(X_test)
+    y_pred
+    np.sort(y_pred)
+
+    array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+           1, 1, 2, 2, 2, 2, 2, 2])
+
+    Y_test
+    np.sort(Y_test)
+
+    array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+           1, 2, 2, 2, 2, 2, 2, 2])
+
+    #confusion Matrix
+    from sklearn.metrics import confusion_matrix
+
+    confusion_matrix(Y_test,y_pred)
+
+    array([[14,  0,  0],
+           [ 0,  9,  0],
+           [ 0,  1,  6]], dtype=int64)
+
+    (28/30)*100
+
+    93.33333333333333
+
+    logmodel.score(X_test,Y_test)
+
+    0.9666666666666667
+
+    #KNeighbors Classifier
+
+    from sklearn.neighbors import KNeighborsClassifier
+
+    classifer_knn=KNeighborsClassifier(n_neighbors=5,metric='minkowski',p=2)
+    classifer_knn.fit(X_train,Y_train)
+    y_pred_knn=classifer_knn.predict(X_test)
+    y_pred_knn
+
+    array([2, 2, 0, 1, 1, 2, 0, 2, 0, 0, 2, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1,
+           0, 0, 0, 0, 1, 0, 1, 2])
+
+    from sklearn.metrics import confusion_matrix
+
+    confusion_matrix(Y_test,y_pred_knn)
+
+    array([[14,  0,  0],
+           [ 0,  9,  0],
+           [ 0,  1,  6]], dtype=int64)
+
+    classifer_knn.score(X_test,Y_test)
+
+    0.9666666666666667
+
+    from sklearn.metrics import accuracy_score
+
+    accuracy_score(y_pred_knn,Y_test)
+
+    0.9666666666666667
+
+    # NaiveBias Model
+    from sklearn.naive_bayes import GaussianNB
+    classifier_nb= GaussianNB()
+     
+    classifier_nb.fit(X_train,Y_train)
+
+    y_pred= classifier_nb.predict(X_test)
+    y_pred
+
+    array([2, 2, 0, 1, 1, 2, 0, 2, 0, 0, 2, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1,
+           0, 0, 0, 0, 1, 0, 1, 2])
+
+    from sklearn.metrics import accuracy_score
+
+    accuracy_score(y_pred,Y_test)
+
+    0.9666666666666667
+
+    confusion_matrix(Y_test,y_pred)
+
+    array([[14,  0,  0],
+           [ 0,  9,  0],
+           [ 0,  1,  6]], dtype=int64)
+
+    classifier_nb.score(X_test,Y_test)
+
+    0.9666666666666667
+
+    df
+
+         petal.length  petal.width    variety  cluster
+    0        0.041667          0.2     Setosa        1
+    1        0.041667          0.2     Setosa        1
+    2        0.041667          0.2     Setosa        1
+    3        0.041667          0.2     Setosa        1
+    4        0.041667          0.2     Setosa        1
+    ..            ...          ...        ...      ...
+    145      0.916667          2.3  Virginica        0
+    146      0.750000          1.9  Virginica        0
+    147      0.791667          2.0  Virginica        0
+    148      0.916667          2.3  Virginica        0
+    149      0.708333          1.8  Virginica        0
+
+    [150 rows x 4 columns]
+
+    a=df.iloc[:,0:2].values
+    a
+
+    array([[0.04166667, 0.2       ],
+           [0.04166667, 0.2       ],
+           [0.04166667, 0.2       ],
+           [0.04166667, 0.2       ],
+           [0.04166667, 0.2       ],
+           [0.125     , 0.4       ],
+           [0.08333333, 0.3       ],
+           [0.04166667, 0.2       ],
+           [0.04166667, 0.2       ],
+           [0.        , 0.1       ],
+           [0.04166667, 0.2       ],
+           [0.04166667, 0.2       ],
+           [0.        , 0.1       ],
+           [0.        , 0.1       ],
+           [0.04166667, 0.2       ],
+           [0.125     , 0.4       ],
+           [0.125     , 0.4       ],
+           [0.08333333, 0.3       ],
+           [0.08333333, 0.3       ],
+           [0.08333333, 0.3       ],
+           [0.04166667, 0.2       ],
+           [0.125     , 0.4       ],
+           [0.04166667, 0.2       ],
+           [0.16666667, 0.5       ],
+           [0.04166667, 0.2       ],
+           [0.04166667, 0.2       ],
+           [0.125     , 0.4       ],
+           [0.04166667, 0.2       ],
+           [0.04166667, 0.2       ],
+           [0.04166667, 0.2       ],
+           [0.04166667, 0.2       ],
+           [0.125     , 0.4       ],
+           [0.        , 0.1       ],
+           [0.04166667, 0.2       ],
+           [0.04166667, 0.2       ],
+           [0.04166667, 0.2       ],
+           [0.04166667, 0.2       ],
+           [0.        , 0.1       ],
+           [0.04166667, 0.2       ],
+           [0.04166667, 0.2       ],
+           [0.08333333, 0.3       ],
+           [0.08333333, 0.3       ],
+           [0.04166667, 0.2       ],
+           [0.20833333, 0.6       ],
+           [0.125     , 0.4       ],
+           [0.08333333, 0.3       ],
+           [0.04166667, 0.2       ],
+           [0.04166667, 0.2       ],
+           [0.04166667, 0.2       ],
+           [0.04166667, 0.2       ],
+           [0.54166667, 1.4       ],
+           [0.58333333, 1.5       ],
+           [0.58333333, 1.5       ],
+           [0.5       , 1.3       ],
+           [0.58333333, 1.5       ],
+           [0.5       , 1.3       ],
+           [0.625     , 1.6       ],
+           [0.375     , 1.        ],
+           [0.5       , 1.3       ],
+           [0.54166667, 1.4       ],
+           [0.375     , 1.        ],
+           [0.58333333, 1.5       ],
+           [0.375     , 1.        ],
+           [0.54166667, 1.4       ],
+           [0.5       , 1.3       ],
+           [0.54166667, 1.4       ],
+           [0.58333333, 1.5       ],
+           [0.375     , 1.        ],
+           [0.58333333, 1.5       ],
+           [0.41666667, 1.1       ],
+           [0.70833333, 1.8       ],
+           [0.5       , 1.3       ],
+           [0.58333333, 1.5       ],
+           [0.45833333, 1.2       ],
+           [0.5       , 1.3       ],
+           [0.54166667, 1.4       ],
+           [0.54166667, 1.4       ],
+           [0.66666667, 1.7       ],
+           [0.58333333, 1.5       ],
+           [0.375     , 1.        ],
+           [0.41666667, 1.1       ],
+           [0.375     , 1.        ],
+           [0.45833333, 1.2       ],
+           [0.625     , 1.6       ],
+           [0.58333333, 1.5       ],
+           [0.625     , 1.6       ],
+           [0.58333333, 1.5       ],
+           [0.5       , 1.3       ],
+           [0.5       , 1.3       ],
+           [0.5       , 1.3       ],
+           [0.45833333, 1.2       ],
+           [0.54166667, 1.4       ],
+           [0.45833333, 1.2       ],
+           [0.375     , 1.        ],
+           [0.5       , 1.3       ],
+           [0.45833333, 1.2       ],
+           [0.5       , 1.3       ],
+           [0.5       , 1.3       ],
+           [0.41666667, 1.1       ],
+           [0.5       , 1.3       ],
+           [1.        , 2.5       ],
+           [0.75      , 1.9       ],
+           [0.83333333, 2.1       ],
+           [0.70833333, 1.8       ],
+           [0.875     , 2.2       ],
+           [0.83333333, 2.1       ],
+           [0.66666667, 1.7       ],
+           [0.70833333, 1.8       ],
+           [0.70833333, 1.8       ],
+           [1.        , 2.5       ],
+           [0.79166667, 2.        ],
+           [0.75      , 1.9       ],
+           [0.83333333, 2.1       ],
+           [0.79166667, 2.        ],
+           [0.95833333, 2.4       ],
+           [0.91666667, 2.3       ],
+           [0.70833333, 1.8       ],
+           [0.875     , 2.2       ],
+           [0.91666667, 2.3       ],
+           [0.58333333, 1.5       ],
+           [0.91666667, 2.3       ],
+           [0.79166667, 2.        ],
+           [0.79166667, 2.        ],
+           [0.70833333, 1.8       ],
+           [0.83333333, 2.1       ],
+           [0.70833333, 1.8       ],
+           [0.70833333, 1.8       ],
+           [0.70833333, 1.8       ],
+           [0.83333333, 2.1       ],
+           [0.625     , 1.6       ],
+           [0.75      , 1.9       ],
+           [0.79166667, 2.        ],
+           [0.875     , 2.2       ],
+           [0.58333333, 1.5       ],
+           [0.54166667, 1.4       ],
+           [0.91666667, 2.3       ],
+           [0.95833333, 2.4       ],
+           [0.70833333, 1.8       ],
+           [0.70833333, 1.8       ],
+           [0.83333333, 2.1       ],
+           [0.95833333, 2.4       ],
+           [0.91666667, 2.3       ],
+           [0.75      , 1.9       ],
+           [0.91666667, 2.3       ],
+           [1.        , 2.5       ],
+           [0.91666667, 2.3       ],
+           [0.75      , 1.9       ],
+           [0.79166667, 2.        ],
+           [0.91666667, 2.3       ],
+           [0.70833333, 1.8       ]])
+
+    b=df.iloc[:,3].values
+    b
+
+    array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+           1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+           1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+           2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+           2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0,
+           0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+    b.shape
+
+    (150,)
+
+    from sklearn.preprocessing import LabelEncoder
+
+    #svm 
+    from sklearn.svm import SVC
+
+    c_svc=SVC(kernel='sigmoid')
+    c_svc
+
+    SVC(kernel='sigmoid')
+
+    a_train,a_test,b_train,b_test=train_test_split(a,b,test_size=0.5)
+
+    c_svc.fit(a_train,b_train)
+    y_pred=c_svc.predict(a_test)
+    y_pred
+
+    array([0, 1, 2, 1, 2, 0, 1, 1, 1, 2, 1, 2, 2, 1, 0, 1, 1, 2, 2, 1, 0, 0,
+           1, 0, 1, 2, 1, 1, 0, 0, 1, 0, 1, 0, 1, 2, 1, 2, 2, 1, 2, 2, 2, 0,
+           1, 0, 1, 1, 1, 0, 0, 2, 1, 2, 1, 2, 1, 1, 2, 1, 1, 1, 2, 1, 2, 1,
+           2, 1, 0, 2, 0, 2, 0, 0, 2])
+
+    b_test
+
+    array([1, 0, 2, 0, 2, 0, 0, 1, 1, 2, 1, 2, 2, 1, 0, 1, 0, 2, 2, 0, 0, 0,
+           0, 2, 1, 2, 1, 0, 1, 2, 1, 0, 0, 1, 0, 2, 1, 2, 2, 1, 2, 2, 2, 0,
+           0, 0, 1, 0, 0, 0, 0, 0, 0, 2, 1, 2, 1, 1, 2, 0, 0, 0, 2, 1, 2, 0,
+           2, 1, 1, 2, 1, 2, 1, 1, 2])
+
+    confusion_matrix(b_test,y_pred)
+
+    array([[ 9, 17,  1],
+           [ 7, 16,  0],
+           [ 2,  0, 23]], dtype=int64)
+
+    c_svc.score(a_test,b_test)
+
+    0.64
